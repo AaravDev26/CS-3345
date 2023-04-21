@@ -1,25 +1,24 @@
-import java.util.EmptyStackException; // needed to throw exception if pop or peek is called when stack is empty 
+import java.util.EmptyStackException; // needed to throw exception if pop or peek is called when stack is empty
+import java.util.Iterator; // needed to implement iterator
 
-class ListStack implements BKStack // class uses the BKStack interface, implements stack as a linked list
+class ListStack implements BKStack, Iterable<Double> // class uses the BKStack interface, implements stack as a linked list, also implements iterable to make class iterable
 {
     private class Node // node class within ListStack class used for linked list implementation
     {
         double value; // value which node holds
         Node next; // points to next node
 
-        public Node(double value) // default node constructor
+        public Node(double d) // default node constructor
         {
-            this.value = value;
+            this.value = d;
         }
     }
 
-    private Node head; // head of linked list (same as top of stack)
-    private int size; // size of linked list
+    private Node head; // head of linked list (same as top of array)
 
     public ListStack() // default ListStack constructor
     {
         head = null; // sets head as null to begin
-        size = 0; // initial size is zero
     }
 
     @Override // overriding base class method
@@ -28,7 +27,6 @@ class ListStack implements BKStack // class uses the BKStack interface, implemen
         Node newNode = new Node(value); // makes new node with parameter as its value
         newNode.next = head; // sets current head as the node after the created node
         head = newNode; // sets created node as head to push it to the top of the stack
-        size++; // increasing the size variable by 1 when pushing onto stack
     }
 
     @Override // overriding base class method
@@ -41,7 +39,6 @@ class ListStack implements BKStack // class uses the BKStack interface, implemen
         }
         double value = head.value; // holds value in a temporary variable
         head = head.next; // removes value at top
-        size--; // decreasing the size variable by 1 when popping off stack
         return value; // returns value at top which was stored in a temporary variable
     }
 
@@ -60,9 +57,39 @@ class ListStack implements BKStack // class uses the BKStack interface, implemen
         return head == null; // checks by seeing if head is null
     }
 
-    public int count() // Returns the number of elements in the stack
+    public Iterator<Double> iterator() // used for iteration over list
     {
-        return size; // returns size variable
+        return new ListStackIterator();
     }
-    
+
+    private class ListStackIterator implements Iterator<Double> // uses iterator with double, as stack holds doubles
+    {
+        private Node current = head; // current node, initially set to head to start at front of linked list
+
+        public boolean hasNext() // checks to see if current node has a next node
+         {
+            return current != null; // checks if current node is null
+        }
+
+        public Double next() // goes to next node and returns current value
+        {
+            if (!hasNext()) // if there is no next node, exception is thrown
+            {
+                throw new EmptyStackException(); // throws exception
+            }
+            double item = current.value; // holds current value 
+            current = current.next; // goes to next node
+            return item; // returns value
+        }
+    }
+
+    public int count() // method to count number of elements in stack
+    {
+        int ans = 0; // temporary variable to hold number of elements
+        for(double d: this) // using enhanced for loop to iterate over the stack, able to use enhanced for loop because the class is iterable
+        {
+            ans++; // incrementing count variable by 1
+        } 
+        return ans; // returning answer
+    }
 }
